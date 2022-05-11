@@ -27,7 +27,7 @@ epochs = 100
 
 def load_data(df):
     """加载数据。"""
-    D = list()
+    D = []
     for _, row in df.iterrows():
         text = row['text']
         label = row['label']
@@ -53,12 +53,11 @@ def sentence_split(words):
         segment = tokenizer.tokens_to_ids(['[CLS]'] + segment + ['[SEP]'])
         segments.append(segment)
 
-    assert len(segments) > 0
-    if len(segments) > max_segment:
-        segment_ = int(max_segment / 2)
-        return segments[:segment_] + segments[-segment_:]
-    else:
+    assert segments
+    if len(segments) <= max_segment:
         return segments
+    segment_ = int(max_segment / 2)
+    return segments[:segment_] + segments[-segment_:]
 
 
 class data_generator(DataGenerator):
@@ -88,8 +87,7 @@ class data_generator(DataGenerator):
 
     def forfit(self):
         while True:
-            for d in self.__iter__(self.random):
-                yield d
+            yield from self.__iter__(self.random)
 
 
 class Attention(Layer):
@@ -182,9 +180,7 @@ def build_model():
         kernel_initializer=bert.initializer
     )(output)
 
-    model = keras.models.Model([token_ids, segment_ids], output)
-
-    return model
+    return keras.models.Model([token_ids, segment_ids], output)
 
 
 def do_predict(df_test):
