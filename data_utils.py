@@ -113,8 +113,7 @@ class TrainingDataset(object):
 
         def paragraph_process(texts):
             instances = self.paragraph_process(texts)
-            serialized_instances = self.tfrecord_serialize(instances)
-            return serialized_instances
+            return self.tfrecord_serialize(instances)
 
         parallel_apply(
             func=paragraph_process,
